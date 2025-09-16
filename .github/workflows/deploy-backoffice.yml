@@ -1,0 +1,59 @@
+name: Deploy backoffice sur Vercel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/backoffice/**'
+      - '.github/workflows/deploy-backoffice.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint backoffice
+        run: npm run lint --workspace apps/backoffice
+
+      - name: Pull Vercel environment
+        working-directory: apps/backoffice
+        run: npx vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+
+      - name: Build backoffice
+        working-directory: apps/backoffice
+        run: npx vercel build --token=${{ env.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel
+        working-directory: apps/backoffice
+        run: npx vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}

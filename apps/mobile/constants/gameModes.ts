@@ -11,7 +11,7 @@ export type GameMode = {
   translations: Record<Language, GameModeCopy>;
 };
 
-export const gameModes: GameMode[] = [
+export const defaultGameModes: GameMode[] = [
   {
     id: 'classic',
     translations: {

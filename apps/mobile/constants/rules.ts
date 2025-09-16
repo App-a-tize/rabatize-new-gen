@@ -20,7 +20,7 @@ export type CompiledRule = {
   translationMap: Partial<Record<Language, string>>;
 };
 
-const ruleTemplates: RuleTemplate[] = [
+export const defaultRuleTemplates: RuleTemplate[] = [
   {
     id: 'toast-master',
     title: 'Toast Master',
@@ -199,6 +199,7 @@ export const compileRule = (
   maxDrinks: number,
   modeId: string | null,
   language: Language,
+  ruleTemplates: RuleTemplate[] = defaultRuleTemplates,
 ): CompiledRule | null => {
   if (players.length === 0) {
     return null;

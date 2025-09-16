@@ -6,6 +6,8 @@ on:
 jobs:
   preview:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ vars.EXPO_PREVIEW_ENVIRONMENT || 'DEV' }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}

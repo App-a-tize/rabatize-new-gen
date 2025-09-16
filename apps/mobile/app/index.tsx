@@ -51,7 +51,7 @@ const PlayerSetupScreen = () => {
               showsVerticalScrollIndicator={false}
             >
               {players.map((player, index) => (
-                <View key={`${index}-${player}`} style={styles.playerRow}>
+                <View key={`player-${index}`} style={styles.playerRow}>
                   <TextInput
                     value={player}
                     onChangeText={(text) => updatePlayer(index, text)}

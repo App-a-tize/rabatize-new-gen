@@ -27,10 +27,15 @@ if (!fs.existsSync(expoCliRoot)) {
 const targetDir = path.join(expoCliRoot, 'build', 'src', 'install', 'utils');
 
 if (!fs.existsSync(targetDir)) {
-  console.warn(
-    '[postinstall] Skipping Expo CLI autoAddConfigPlugins patch because the expected utils directory is missing.'
-  );
-  return;
+  try {
+    fs.mkdirSync(targetDir, { recursive: true });
+  } catch (error) {
+    console.warn(
+      '[postinstall] Failed to create Expo CLI utils directory for autoAddConfigPlugins fallback:',
+      error
+    );
+    return;
+  }
 }
 
 const targetPath = path.join(targetDir, 'autoAddConfigPlugins.js');

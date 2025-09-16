@@ -6,7 +6,7 @@
       "packages/*"
     ],
     "scripts": {
-      "dev": "cd apps/mobile && expo start",
+      "dev": "npm run dev --workspace apps/mobile",
       "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
       "format": "prettier --write .",
       "test": "jest --passWithNoTests"

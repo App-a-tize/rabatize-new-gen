@@ -4,7 +4,8 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 
 import { useGame } from '@/context/GameContext';
 import { useLocalization } from '@/context/LocalizationContext';
-import { gameModes, getGameModeCopy } from '@/constants/gameModes';
+import { getGameModeCopy } from '@/constants/gameModes';
+import { useRemoteConfig } from '@/context/RemoteConfigContext';
 
 const ModeSelectionScreen = () => {
   const {
@@ -17,6 +18,7 @@ const ModeSelectionScreen = () => {
   } = useGame();
   const router = useRouter();
   const { t, language } = useLocalization();
+  const { gameModes } = useRemoteConfig();
   const [expandedModeId, setExpandedModeId] = useState<string | null>(selectedModeId);
 
   const canStart = Boolean(selectedModeId) && activePlayers.length >= 2;

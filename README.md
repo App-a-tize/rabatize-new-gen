@@ -17,3 +17,35 @@ Le workflow [`pr-preview.yml`](.github/workflows/pr-preview.yml) construit autom
 - Un commentaire est ajouté sur la PR avec les liens de téléchargement.
 
 Les secrets ne sont pas exposés aux forks ; pour les contributions externes, déclenchez les builds depuis une branche du dépôt principal.
+
+## Base de données des modes et des règles
+
+- Le script [`apps/mobile/scripts/init-vercel-db.sql`](apps/mobile/scripts/init-vercel-db.sql) crée la structure Postgres (hébergée sur Vercel) et insère les modes/règles par défaut. Appliquez-le sur une base neuve via `psql` ou le dashboard Vercel Postgres.
+- Exposez une route HTTP (par exemple `/config`) qui retourne un JSON de la forme suivante pour que l’application mobile puisse consommer les données :
+
+  ```json
+  {
+    "modes": [
+      {
+        "id": "classic",
+        "translations": {
+          "en": { "name": "Classic Rabatize", "tagline": "…", "description": "…" },
+          "fr": { "name": "Rabatize Classique", "tagline": "…", "description": "…" }
+        }
+      }
+    ],
+    "rules": [
+      {
+        "id": "toast-master",
+        "language": "en",
+        "title": "Toast Master",
+        "prompt": "{{player_1}} raises a toast…",
+        "participants": 1,
+        "modeIds": ["classic", "storyteller", "chaos"],
+        "translationMap": { "en": "toast-master", "fr": "toast-master-fr" }
+      }
+    ]
+  }
+  ```
+
+- Ajoutez la variable d’environnement `EXPO_PUBLIC_API_URL` (ex. `https://rabatize-api.vercel.app`) dans la configuration Expo afin que l’application récupère les données avant d’afficher l’interface.

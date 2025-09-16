@@ -4,16 +4,21 @@ import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { useGame } from '@/context/GameContext';
 import { useLocalization } from '@/context/LocalizationContext';
-import { gameModes, getGameModeCopy } from '@/constants/gameModes';
+import { getGameModeCopy } from '@/constants/gameModes';
 import { compileRule, type CompiledRule } from '@/constants/rules';
+import { useRemoteConfig } from '@/context/RemoteConfigContext';
 
 const GameScreen = () => {
   const { activePlayers, selectedModeId, maxDrinks } = useGame();
   const router = useRouter();
   const { t, language } = useLocalization();
+  const { gameModes, ruleTemplates } = useRemoteConfig();
   const [currentRule, setCurrentRule] = useState<CompiledRule | null>(null);
 
-  const mode = useMemo(() => gameModes.find((item) => item.id === selectedModeId), [selectedModeId]);
+  const mode = useMemo(
+    () => gameModes.find((item) => item.id === selectedModeId),
+    [gameModes, selectedModeId],
+  );
   const modeCopy = useMemo(() => (mode ? getGameModeCopy(mode, language) : null), [language, mode]);
 
   useEffect(() => {
@@ -33,12 +38,12 @@ const GameScreen = () => {
       return;
     }
 
-    setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language));
-  }, [activePlayers, language, maxDrinks, selectedModeId]);
+    setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language, ruleTemplates));
+  }, [activePlayers, language, maxDrinks, ruleTemplates, selectedModeId]);
 
   const handleNextCard = () => {
     if (selectedModeId) {
-      setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language));
+      setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language, ruleTemplates));
     }
   };
 

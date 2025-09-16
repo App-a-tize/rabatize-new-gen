@@ -7,27 +7,37 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetPath = path.join(
+const expoCliRoot = path.join(
   __dirname,
   '..',
   'node_modules',
   'expo',
   'node_modules',
   '@expo',
-  'cli',
-  'build',
-  'src',
-  'install',
-  'utils',
-  'autoAddConfigPlugins.js'
+  'cli'
 );
+
+if (!fs.existsSync(expoCliRoot)) {
+  console.warn(
+    '[postinstall] Skipping Expo CLI autoAddConfigPlugins patch because the CLI is not installed yet.'
+  );
+  return;
+}
+
+const targetDir = path.join(expoCliRoot, 'build', 'src', 'install', 'utils');
+
+if (!fs.existsSync(targetDir)) {
+  console.warn(
+    '[postinstall] Skipping Expo CLI autoAddConfigPlugins patch because the expected utils directory is missing.'
+  );
+  return;
+}
+
+const targetPath = path.join(targetDir, 'autoAddConfigPlugins.js');
 
 if (fs.existsSync(targetPath)) {
   return;
 }
-
-const targetDir = path.dirname(targetPath);
-fs.mkdirSync(targetDir, { recursive: true });
 
 const fileContents = `"use strict";
 Object.defineProperty(exports, "__esModule", {

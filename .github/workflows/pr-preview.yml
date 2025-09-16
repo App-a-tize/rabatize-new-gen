@@ -26,7 +26,7 @@ jobs:
             apps/mobile/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Validate Expo secrets
         run: |
@@ -46,20 +46,34 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: EAS Update (OTA) per PR
+      - name: Pre-export update bundle
+        env:
+          EXPO_ROUTER_APP_ROOT: ./app
+          EXPO_NO_METRO_CACHE: "1"
+          NODE_ENV: production
+          BABEL_ENV: production
         run: |
-          eas update --branch "pr-${{ github.event.number }}" \
-            --message "PR #${{ github.event.number }}"
+          rm -rf node_modules/.cache || true
+          npx expo export \
+            --clear \
+            --output-dir dist \
+            --dump-sourcemap \
+            --dump-assetmap \
+            --platform ios \
+            --platform android
+
+      - name: EAS Update (OTA) per PR
+        run: 'eas update --branch "pr-${{ github.event.number }}" --message "PR #${{ github.event.number }}" --input-dir dist'
 
       - name: Build Android (preview)
         id: android
         run: |
-          npx eas build --platform android --profile preview --non-interactive --wait --json > android.json
+          eas build --platform android --profile preview --non-interactive --wait --json > android.json
           echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' android.json)" >> "$GITHUB_OUTPUT"
       - name: Build iOS (preview)
         id: ios
         run: |
-          npx eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
+          eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
           echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' ios.json)" >> "$GITHUB_OUTPUT"
 
       - name: Comment PR with links

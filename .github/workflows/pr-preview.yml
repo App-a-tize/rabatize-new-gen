@@ -2,32 +2,67 @@ name: PR Mobile Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   preview:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ vars.EXPO_PREVIEW_ENVIRONMENT || 'DEV' }}
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+    defaults:
+      run:
+        working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: npm ci
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Expo secrets
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::Missing Expo access token. Configure the EXPO_TOKEN secret." >&2
+            exit 1
+          fi
+          if [ -z "$EAS_PROJECT_ID" ]; then
+            echo "::error::Missing Expo project id. Configure the EAS_PROJECT_ID secret." >&2
+            exit 1
+          fi
+
       - name: Expo/EAS login
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
       - name: EAS Update (OTA) per PR
-        run: npx eas update --branch pr-${{ github.event.number }} --message "PR #${{ github.event.number }}"
+        run: |
+          eas update --branch "pr-${{ github.event.number }}" \
+            --message "PR #${{ github.event.number }}"
+
       - name: Build Android (preview)
         id: android
         run: |
-          npx eas build --platform android --profile preview --non-interactive --wait --json > android.json
-          echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' android.json)" >> $GITHUB_OUTPUT
+          eas build --platform android --profile preview --non-interactive --wait --json > android.json
+          echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' android.json)" >> "$GITHUB_OUTPUT"
+
       - name: Build iOS (preview)
         id: ios
         run: |
-          npx eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
-          echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' ios.json)" >> $GITHUB_OUTPUT
+          eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
+          echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' ios.json)" >> "$GITHUB_OUTPUT"
+
       - name: Comment PR with links
         uses: marocchino/sticky-pull-request-comment@v2
         with:

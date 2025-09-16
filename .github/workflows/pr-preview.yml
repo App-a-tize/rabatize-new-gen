@@ -54,13 +54,12 @@ jobs:
       - name: Build Android (preview)
         id: android
         run: |
-          eas build --platform android --profile preview --non-interactive --wait --json > android.json
+          npx eas build --platform android --profile preview --non-interactive --wait --json > android.json
           echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' android.json)" >> "$GITHUB_OUTPUT"
-
       - name: Build iOS (preview)
         id: ios
         run: |
-          eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
+          npx eas build --platform ios --profile preview --non-interactive --wait --json > ios.json
           echo "url=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl // empty' ios.json)" >> "$GITHUB_OUTPUT"
 
       - name: Comment PR with links

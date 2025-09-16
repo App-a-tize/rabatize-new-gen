@@ -3,15 +3,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { useGame } from '@/context/GameContext';
-import { gameModes } from '@/constants/gameModes';
+import { useLocalization } from '@/context/LocalizationContext';
+import { gameModes, getGameModeCopy } from '@/constants/gameModes';
 import { compileRule, type CompiledRule } from '@/constants/rules';
 
 const GameScreen = () => {
   const { activePlayers, selectedModeId, maxDrinks } = useGame();
   const router = useRouter();
+  const { t, language } = useLocalization();
   const [currentRule, setCurrentRule] = useState<CompiledRule | null>(null);
 
   const mode = useMemo(() => gameModes.find((item) => item.id === selectedModeId), [selectedModeId]);
+  const modeCopy = useMemo(() => (mode ? getGameModeCopy(mode, language) : null), [language, mode]);
 
   useEffect(() => {
     if (activePlayers.length < 2) {
@@ -30,12 +33,12 @@ const GameScreen = () => {
       return;
     }
 
-    setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId));
-  }, [activePlayers, maxDrinks, selectedModeId]);
+    setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language));
+  }, [activePlayers, language, maxDrinks, selectedModeId]);
 
   const handleNextCard = () => {
     if (selectedModeId) {
-      setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId));
+      setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language));
     }
   };
 
@@ -47,8 +50,8 @@ const GameScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.modeName}>{mode?.name ?? 'Rabatize'}</Text>
-          <Text style={styles.modeSubtitle}>Up to {maxDrinks} drinks per card</Text>
+          <Text style={styles.modeName}>{modeCopy?.name ?? t('home.title')}</Text>
+          <Text style={styles.modeSubtitle}>{t('game.maxDrinks', { count: maxDrinks })}</Text>
         </View>
 
         <View style={styles.card}>
@@ -58,7 +61,7 @@ const GameScreen = () => {
                 <Text style={styles.cardTitle}>{currentRule.title}</Text>
                 <View style={styles.drinksBadge}>
                   <Text style={styles.drinksBadgeText}>{currentRule.drinks}</Text>
-                  <Text style={styles.drinksBadgeLabel}>drinks</Text>
+                  <Text style={styles.drinksBadgeLabel}>{t('game.drinksLabel')}</Text>
                 </View>
               </View>
 
@@ -75,18 +78,16 @@ const GameScreen = () => {
               <Text style={styles.cardBody}>{currentRule.text}</Text>
             </>
           ) : (
-            <Text style={styles.cardBody}>
-              Add more players or adjust the mode to generate a rule.
-            </Text>
+            <Text style={styles.cardBody}>{t('game.emptyState')}</Text>
           )}
         </View>
 
         <View style={styles.actions}>
           <Pressable style={styles.primaryButton} onPress={handleNextCard}>
-            <Text style={styles.primaryButtonText}>Next card</Text>
+            <Text style={styles.primaryButtonText}>{t('game.nextCard')}</Text>
           </Pressable>
           <Pressable style={styles.secondaryButton} onPress={handleAdjustSettings}>
-            <Text style={styles.secondaryButtonText}>Adjust settings</Text>
+            <Text style={styles.secondaryButtonText}>{t('game.adjustSettings')}</Text>
           </Pressable>
         </View>
       </View>

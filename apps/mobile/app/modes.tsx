@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useGame } from '@/context/GameContext';
-import { gameModes } from '@/constants/gameModes';
+import { useLocalization } from '@/context/LocalizationContext';
+import { gameModes, getGameModeCopy } from '@/constants/gameModes';
 
 const ModeSelectionScreen = () => {
   const {
@@ -15,6 +16,7 @@ const ModeSelectionScreen = () => {
     decreaseMaxDrinks,
   } = useGame();
   const router = useRouter();
+  const { t, language } = useLocalization();
   const [expandedModeId, setExpandedModeId] = useState<string | null>(selectedModeId);
 
   const canStart = Boolean(selectedModeId) && activePlayers.length >= 2;
@@ -28,13 +30,14 @@ const ModeSelectionScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Select a game mode</Text>
-        <Text style={styles.subtitle}>Each mode changes the rhythm of the night.</Text>
+        <Text style={styles.title}>{t('modes.title')}</Text>
+        <Text style={styles.subtitle}>{t('modes.subtitle')}</Text>
 
         <ScrollView style={styles.modeList} contentContainerStyle={styles.modeListContent}>
           {gameModes.map((mode) => {
             const selected = mode.id === selectedModeId;
             const expanded = mode.id === expandedModeId || selected;
+            const copy = getGameModeCopy(mode, language);
 
             return (
               <Pressable
@@ -45,9 +48,9 @@ const ModeSelectionScreen = () => {
                 }}
                 style={[styles.modeCard, selected && styles.modeCardSelected]}
               >
-                <Text style={styles.modeTitle}>{mode.name}</Text>
-                <Text style={styles.modeTagline}>{mode.tagline}</Text>
-                {expanded && <Text style={styles.modeDescription}>{mode.description}</Text>}
+                <Text style={styles.modeTitle}>{copy.name}</Text>
+                <Text style={styles.modeTagline}>{copy.tagline}</Text>
+                {expanded && <Text style={styles.modeDescription}>{copy.description}</Text>}
               </Pressable>
             );
           })}
@@ -55,8 +58,8 @@ const ModeSelectionScreen = () => {
 
         <View style={styles.settingsPanel}>
           <View>
-            <Text style={styles.settingsTitle}>Maximum drinks per card</Text>
-            <Text style={styles.settingsSubtitle}>Tune the intensity before you start.</Text>
+            <Text style={styles.settingsTitle}>{t('modes.settingsTitle')}</Text>
+            <Text style={styles.settingsSubtitle}>{t('modes.settingsSubtitle')}</Text>
           </View>
           <View style={styles.stepper}>
             <Pressable style={styles.stepperButton} onPress={decreaseMaxDrinks}>
@@ -74,9 +77,9 @@ const ModeSelectionScreen = () => {
           style={[styles.startButton, !canStart && styles.startButtonDisabled]}
           disabled={!canStart}
         >
-          <Text style={styles.startButtonText}>Start the game</Text>
+          <Text style={styles.startButtonText}>{t('modes.startGame')}</Text>
           {!canStart && (
-            <Text style={styles.helperText}>Select a mode and make sure at least two players are ready.</Text>
+            <Text style={styles.helperText}>{t('modes.helper')}</Text>
           )}
         </Pressable>
       </View>

@@ -14,10 +14,12 @@ import {
 } from 'react-native';
 
 import { useGame } from '@/context/GameContext';
+import { useLocalization } from '@/context/LocalizationContext';
 
 const PlayerSetupScreen = () => {
   const { players, activePlayers, updatePlayer, addPlayer, removePlayer, resetMode } = useGame();
   const router = useRouter();
+  const { t, language, toggleLanguage } = useLocalization();
 
   useEffect(() => {
     resetMode();
@@ -31,6 +33,10 @@ const PlayerSetupScreen = () => {
     }
   };
 
+  const nextLanguage = language === 'en' ? 'fr' : 'en';
+  const nextLanguageName = t(nextLanguage === 'en' ? 'language.en' : 'language.fr');
+  const flag = language === 'fr' ? '🇫🇷' : '🇬🇧';
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -39,9 +45,21 @@ const PlayerSetupScreen = () => {
         style={styles.flex}
       >
         <View style={styles.container}>
+          <View style={styles.languageRow}>
+            <Pressable
+              accessibilityHint={t('home.languageToggle.hint', { language: nextLanguageName })}
+              accessibilityLabel={t('home.languageToggle.accessibility')}
+              accessibilityRole="button"
+              hitSlop={10}
+              onPress={toggleLanguage}
+              style={styles.languageToggle}
+            >
+              <Text style={styles.languageFlag}>{flag}</Text>
+            </Pressable>
+          </View>
           <View style={styles.header}>
-            <Text style={styles.title}>Rabatize</Text>
-            <Text style={styles.subtitle}>Gather the crew and set the stage.</Text>
+            <Text style={styles.title}>{t('home.title')}</Text>
+            <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
           </View>
 
           <View style={styles.playerSection}>
@@ -55,13 +73,13 @@ const PlayerSetupScreen = () => {
                   <TextInput
                     value={player}
                     onChangeText={(text) => updatePlayer(index, text)}
-                    placeholder={`Player ${index + 1}`}
+                    placeholder={t('home.playerPlaceholder', { index: index + 1 })}
                     placeholderTextColor="#777"
                     style={styles.playerInput}
                   />
                   {players.length > 1 && (
                     <Pressable
-                      accessibilityLabel={`Remove player ${index + 1}`}
+                      accessibilityLabel={t('home.removePlayer', { index: index + 1 })}
                       onPress={() => removePlayer(index)}
                       style={styles.removeButton}
                     >
@@ -72,7 +90,7 @@ const PlayerSetupScreen = () => {
               ))}
 
               <Pressable style={styles.addButton} onPress={addPlayer}>
-                <Text style={styles.addButtonText}>+ Add player</Text>
+                <Text style={styles.addButtonText}>{t('home.addPlayer')}</Text>
               </Pressable>
             </ScrollView>
           </View>
@@ -82,10 +100,8 @@ const PlayerSetupScreen = () => {
             style={[styles.startButton, !canStart && styles.startButtonDisabled]}
             disabled={!canStart}
           >
-            <Text style={styles.startButtonText}>Choose a mode</Text>
-            {!canStart && (
-              <Text style={styles.helperText}>Add at least two players to begin.</Text>
-            )}
+            <Text style={styles.startButtonText}>{t('home.chooseMode')}</Text>
+            {!canStart && <Text style={styles.helperText}>{t('home.helperAddPlayers')}</Text>}
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -109,6 +125,20 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: 8,
+  },
+  languageRow: {
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  languageToggle: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(148, 163, 184, 0.2)',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  languageFlag: {
+    fontSize: 18,
   },
   title: {
     fontSize: 36,

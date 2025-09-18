@@ -1,7 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build --workspace apps/backoffice",
-  "devCommand": "npm run dev --workspace apps/backoffice",
-  "installCommand": "npm install",
-  "outputDirectory": "apps/backoffice/.next"
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev"
 }

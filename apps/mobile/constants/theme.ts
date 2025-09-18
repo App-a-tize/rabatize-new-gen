@@ -1,0 +1,52 @@
+export const theme = {
+  colors: {
+    background: '#e8edf5',
+    backgroundAlt: '#f4f7fb',
+    surface: '#f6f9ff',
+    accent: '#7b6cff',
+    accentSoft: '#a094ff',
+    textPrimary: '#1f2937',
+    textSecondary: '#475569',
+    textMuted: '#64748b',
+    danger: '#f87171',
+    success: '#34d399',
+    shadowDark: '#b7c3dd',
+    shadowLight: '#ffffff',
+  },
+};
+
+export const neumorphicStyles = {
+  surface: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.7)',
+    shadowColor: theme.colors.shadowDark,
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  concave: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.shadowDark,
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  pressable: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.65)',
+    shadowColor: theme.colors.shadowDark,
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+};

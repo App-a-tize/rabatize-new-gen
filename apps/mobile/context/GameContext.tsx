@@ -1,12 +1,27 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 const defaultPlayers = ['Player 1', 'Player 2', 'Player 3'] as const;
+
+export type PlayerDrinkStat = {
+  index: number;
+  name: string;
+  drinks: number;
+};
 
 type GameContextValue = {
   players: string[];
   activePlayers: string[];
   selectedModeId: string | null;
   maxDrinks: number;
+  playerStats: PlayerDrinkStat[];
   updatePlayer: (index: number, name: string) => void;
   addPlayer: () => void;
   removePlayer: (index: number) => void;
@@ -15,6 +30,9 @@ type GameContextValue = {
   increaseMaxDrinks: () => void;
   decreaseMaxDrinks: () => void;
   setMaxDrinks: (value: number) => void;
+  adjustDrinkTotal: (index: number, delta: number) => void;
+  recordDrinkForPlayer: (playerName: string, amount: number) => void;
+  resetDrinkStats: () => void;
 };
 
 const GameContext = createContext<GameContextValue | undefined>(undefined);
@@ -23,6 +41,21 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [players, setPlayers] = useState<string[]>(() => [...defaultPlayers]);
   const [selectedModeId, setSelectedModeId] = useState<string | null>(null);
   const [maxDrinks, setMaxDrinksValue] = useState<number>(3);
+  const [drinkLog, setDrinkLog] = useState<number[]>(() => players.map(() => 0));
+
+  useEffect(() => {
+    setDrinkLog((current) => {
+      if (current.length === players.length) {
+        return current;
+      }
+
+      if (current.length < players.length) {
+        return [...current, ...Array(players.length - current.length).fill(0)];
+      }
+
+      return current.slice(0, players.length);
+    });
+  }, [players.length]);
 
   const updatePlayer = useCallback((index: number, name: string) => {
     setPlayers((current) =>
@@ -32,10 +65,12 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
   const addPlayer = useCallback(() => {
     setPlayers((current) => [...current, `Player ${current.length + 1}`]);
+    setDrinkLog((current) => [...current, 0]);
   }, []);
 
   const removePlayer = useCallback((index: number) => {
     setPlayers((current) => (current.length > 1 ? current.filter((_, i) => i !== index) : current));
+    setDrinkLog((current) => (current.length > 1 ? current.filter((_, i) => i !== index) : current));
   }, []);
 
   const selectMode = useCallback((modeId: string) => {
@@ -58,9 +93,55 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setMaxDrinksValue(Math.max(1, Math.round(value)));
   }, []);
 
+  const adjustDrinkTotal = useCallback((index: number, delta: number) => {
+    setDrinkLog((current) => {
+      if (index < 0 || index >= current.length) {
+        return current;
+      }
+
+      const next = [...current];
+      const updated = (next[index] ?? 0) + delta;
+      next[index] = Math.max(0, updated);
+      return next;
+    });
+  }, []);
+
+  const recordDrinkForPlayer = useCallback(
+    (playerName: string, amount: number) => {
+      if (!playerName || amount <= 0) {
+        return;
+      }
+
+      const index = players.findIndex((player) => player.trim() === playerName.trim());
+
+      if (index === -1) {
+        return;
+      }
+
+      adjustDrinkTotal(index, amount);
+    },
+    [adjustDrinkTotal, players],
+  );
+
+  const resetDrinkStats = useCallback(() => {
+    setDrinkLog(players.map(() => 0));
+  }, [players]);
+
   const activePlayers = useMemo(
     () => players.map((player) => player.trim()).filter((player) => player.length > 0),
     [players],
+  );
+
+  const playerStats = useMemo(
+    () =>
+      players
+        .map((player, index) => ({
+          index,
+          name: player.trim(),
+          drinks: drinkLog[index] ?? 0,
+        }))
+        .filter(({ name }) => name.length > 0),
+    [drinkLog, players],
   );
 
   const value = useMemo(
@@ -69,6 +150,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       activePlayers,
       selectedModeId,
       maxDrinks,
+      playerStats,
       updatePlayer,
       addPlayer,
       removePlayer,
@@ -77,12 +159,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       increaseMaxDrinks,
       decreaseMaxDrinks,
       setMaxDrinks,
+      adjustDrinkTotal,
+      recordDrinkForPlayer,
+      resetDrinkStats,
     }),
     [
       players,
       activePlayers,
       selectedModeId,
       maxDrinks,
+      playerStats,
       updatePlayer,
       addPlayer,
       removePlayer,
@@ -91,6 +177,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       increaseMaxDrinks,
       decreaseMaxDrinks,
       setMaxDrinks,
+      adjustDrinkTotal,
+      recordDrinkForPlayer,
+      resetDrinkStats,
     ],
   );
 

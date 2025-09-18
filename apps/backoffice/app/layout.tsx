@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Link from 'next/link';
+import NavigationBar from '@/components/NavigationBar';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,7 +19,23 @@ export default function RootLayout({
     <html lang="fr">
       <body>
         <div className="visually-hidden" id="__next-skip-link-anchor" />
-        {children}
+        <a className="skip-link" href="#main-content">
+          Aller au contenu principal
+        </a>
+        <NavigationBar />
+        <main id="main-content" className="page-shell">
+          {children}
+        </main>
+        <footer className="page-footer">
+          <div className="nav-container">
+            <p>
+              Conçu pour le backoffice Rabatize – synchronisation LiveOps &amp; Vercel.
+            </p>
+            <Link href="https://vercel.com" target="_blank" rel="noreferrer" className="nav-link subtle">
+              Infrastructure Vercel
+            </Link>
+          </div>
+        </footer>
       </body>
     </html>
   );

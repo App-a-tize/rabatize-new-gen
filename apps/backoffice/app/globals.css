@@ -30,6 +30,25 @@ body {
   min-height: 100%;
 }
 
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: -999px;
+  background: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  left: 16px;
+  top: 16px;
+  z-index: 20;
+  transform: scale(1.02);
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -51,8 +70,85 @@ button {
   border: 0;
 }
 
-main {
+.page-shell {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding-bottom: 48px;
+}
+
+.page-footer {
+  background: rgba(15, 23, 42, 0.9);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 20px 0;
+  margin-top: auto;
+}
+
+.page-footer .nav-container {
+  align-items: center;
+  gap: 12px;
+}
+
+.page-footer .nav-link.subtle {
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+}
+
+.page-footer .nav-link.subtle:hover {
+  color: white;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.nav-container {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand-link {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: var(--muted);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--foreground);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.nav-link.active {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
 }
 
 .dashboard-container {
@@ -62,6 +158,76 @@ main {
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  vertical-align: top;
+  text-align: left;
+}
+
+.data-table thead th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(15, 23, 42, 0.6);
+  font-weight: 700;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.data-table tbody th {
+  font-size: 1rem;
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.tag-cloud.inline {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.table-primary {
+  font-weight: 600;
+}
+
+.table-secondary {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.metric-grid.compact {
+  grid-template-columns: repeat(3, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.metric-grid.compact .metric {
+  background: rgba(37, 99, 235, 0.08);
+  padding: 12px;
+  gap: 4px;
+}
+
+.metric-grid.compact .metric strong {
+  font-size: 1.1rem;
 }
 
 .dashboard-grid {
@@ -278,6 +444,29 @@ main {
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 32px 20px 48px;
+  }
+
+  .nav-container {
+    padding: 14px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    width: 100%;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table {
+    min-width: 640px;
   }
 
   .timeline-item {

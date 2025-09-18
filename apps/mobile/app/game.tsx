@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { useGame } from '@/context/GameContext';
@@ -17,6 +17,7 @@ const GameScreen = () => {
   const { gameModes, ruleTemplates } = useRemoteConfig();
   const [currentRule, setCurrentRule] = useState<CompiledRule | null>(null);
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
 
   const mode = useMemo(
     () => gameModes.find((item) => item.id === selectedModeId),
@@ -39,19 +40,48 @@ const GameScreen = () => {
     }
   }, [activePlayers.length, router, selectedModeId]);
 
-  useEffect(() => {
+  const syncRule = useCallback(() => {
     if (!selectedModeId || activePlayers.length === 0) {
       setCurrentRule(null);
+      setSelectedPlayers([]);
       return;
     }
 
-    setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language, ruleTemplates));
+    const nextRule = compileRule(activePlayers, maxDrinks, selectedModeId, language, ruleTemplates);
+
+    setCurrentRule(nextRule);
+    setSelectedPlayers((nextRule?.players ?? []).filter((player) => player.trim().length > 0));
   }, [activePlayers, language, maxDrinks, ruleTemplates, selectedModeId]);
 
+  useEffect(() => {
+    syncRule();
+  }, [syncRule]);
+
+  const availablePlayers = useMemo(() => {
+    const combined = [...(currentRule?.players ?? []), ...activePlayers];
+    const seen = new Set<string>();
+
+    return combined.filter((player) => {
+      if (seen.has(player)) {
+        return false;
+      }
+
+      seen.add(player);
+      return player.trim().length > 0;
+    });
+  }, [activePlayers, currentRule]);
+
   const handleNextCard = () => {
-    if (selectedModeId) {
-      setCurrentRule(compileRule(activePlayers, maxDrinks, selectedModeId, language, ruleTemplates));
+    if (currentRule) {
+      const uniqueSelections = Array.from(new Set(selectedPlayers));
+
+      uniqueSelections.forEach((player) => {
+        recordDrinkForPlayer(player, currentRule.drinks);
+      });
     }
+
+    setSelectedPlayers([]);
+    syncRule();
   };
 
   const handleOpenMenu = () => {
@@ -67,12 +97,14 @@ const GameScreen = () => {
     router.push('/modes');
   };
 
-  const handlePlayerDrank = (player: string) => {
-    if (!currentRule) {
-      return;
-    }
+  const handleTogglePlayer = (player: string) => {
+    setSelectedPlayers((current) => {
+      if (current.includes(player)) {
+        return current.filter((item) => item !== player);
+      }
 
-    recordDrinkForPlayer(player, currentRule.drinks);
+      return [...current, player];
+    });
   };
 
   return (
@@ -102,27 +134,35 @@ const GameScreen = () => {
 
               <View style={styles.cardFooter}>
                 <View style={styles.playersColumn}>
-                  {currentRule.players.length > 0 ? (
+                  {availablePlayers.length > 0 ? (
                     <>
                       <Text style={styles.recordHint}>{t('game.recordHint')}</Text>
                       <View style={styles.playersRow}>
-                        {currentRule.players.map((player) => (
-                          <Pressable
-                            key={player}
-                            style={styles.playerChip}
-                            onPress={() => handlePlayerDrank(player)}
-                            accessibilityRole="button"
-                          >
-                            <Text style={styles.playerChipText}>{player}</Text>
-                          </Pressable>
-                        ))}
+                        {availablePlayers.map((player) => {
+                          const isSelected = selectedPlayers.includes(player);
+
+                          return (
+                            <Pressable
+                              key={player}
+                              style={[styles.playerChip, isSelected && styles.playerChipSelected]}
+                              onPress={() => handleTogglePlayer(player)}
+                              accessibilityRole="button"
+                              accessibilityState={{ selected: isSelected }}
+                            >
+                              <Text
+                                style={[styles.playerChipText, isSelected && styles.playerChipSelectedText]}
+                              >
+                                {player}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
                       </View>
                     </>
                   ) : null}
                 </View>
                 <View style={styles.drinksContainer}>
                   <Text style={styles.drinksCount}>{currentRule.drinks}</Text>
-                  <Text style={styles.drinksLabel}>{t('game.drinksLabel')}</Text>
                 </View>
               </View>
 
@@ -305,9 +345,17 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
+  playerChipSelected: {
+    backgroundColor: theme.colors.accent,
+    borderColor: theme.colors.accent,
+    shadowOpacity: 0.3,
+  },
   playerChipText: {
     color: theme.colors.textSecondary,
     fontWeight: '600',
+  },
+  playerChipSelectedText: {
+    color: '#ffffff',
   },
   recordHint: {
     color: theme.colors.textSecondary,
@@ -315,8 +363,8 @@ const styles = StyleSheet.create({
   },
   drinksContainer: {
     alignItems: 'flex-end',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 18,
     backgroundColor: theme.colors.accent,
     shadowColor: theme.colors.shadowDark,
@@ -327,15 +375,9 @@ const styles = StyleSheet.create({
   },
   drinksCount: {
     color: '#ffffff',
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '700',
-    lineHeight: 32,
-    textAlign: 'center',
-  },
-  drinksLabel: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 12,
-    fontWeight: '500',
+    lineHeight: 26,
     textAlign: 'center',
   },
   actions: {

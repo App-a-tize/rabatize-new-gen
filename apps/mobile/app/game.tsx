@@ -9,6 +9,7 @@ import { getGameModeCopy } from '@/constants/gameModes';
 import { compileRule, type CompiledRule } from '@/constants/rules';
 import { useRemoteConfig } from '@/context/RemoteConfigContext';
 import { theme } from '@/constants/theme';
+import { RabatizeBadge } from '@/components/RabatizeBadge';
 
 const GameScreen = () => {
   const { activePlayers, selectedModeId, maxDrinks, playerStats, recordDrinkForPlayer, adjustDrinkTotal } = useGame();
@@ -112,9 +113,12 @@ const GameScreen = () => {
       <StatusBar style="dark" />
       <View style={styles.container}>
         <View style={styles.topBar}>
-          <View style={styles.modeInfo}>
-            <Text style={styles.modeName}>{modeCopy?.name ?? t('home.title')}</Text>
-            <Text style={styles.modeSubtitle}>{t('game.maxDrinks', { count: maxDrinks })}</Text>
+          <View style={styles.modeHeader}>
+            <RabatizeBadge size="sm" />
+            <View style={styles.modeInfo}>
+              <Text style={styles.modeName}>{modeCopy?.name ?? t('home.title')}</Text>
+              <Text style={styles.modeSubtitle}>{t('game.maxDrinks', { count: maxDrinks })}</Text>
+            </View>
           </View>
           <Pressable style={styles.menuButton} onPress={handleOpenMenu} accessibilityRole="button">
             <Text style={styles.menuButtonText}>{t('game.sessionMenu')}</Text>
@@ -253,6 +257,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
+  modeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    flex: 1,
+  },
   modeInfo: {
     flex: 1,
     gap: 4,
@@ -272,11 +282,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowOffset: { width: 4, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
     elevation: 4,
   },
   menuButtonText: {
@@ -291,11 +301,11 @@ const styles = StyleSheet.create({
     gap: 32,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.28,
+    shadowRadius: 22,
     elevation: 10,
   },
   cardTop: {
@@ -338,11 +348,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: theme.colors.backgroundAlt,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
     elevation: 4,
   },
   playerChipSelected: {
@@ -355,7 +365,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   playerChipSelectedText: {
-    color: '#ffffff',
+    color: '#fff7eb',
   },
   recordHint: {
     color: theme.colors.textSecondary,
@@ -388,10 +398,10 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     backgroundColor: theme.colors.accent,
     alignItems: 'center',
-    shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.32,
+    shadowRadius: 20,
     elevation: 8,
   },
   primaryButtonText: {
@@ -415,7 +425,7 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
     shadowOffset: { width: 8, height: 8 },
     shadowOpacity: 0.25,
@@ -442,7 +452,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.15)',
+    borderBottomColor: 'rgba(84, 44, 11, 0.08)',
     gap: 12,
   },
   modalPlayerInfo: {
@@ -470,11 +480,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.backgroundAlt,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
     elevation: 4,
   },
   modalAdjustButtonDisabled: {
@@ -494,10 +504,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     backgroundColor: theme.colors.accent,
-    shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.32,
+    shadowRadius: 16,
     elevation: 6,
   },
   modalSettingsButtonText: {
@@ -511,7 +521,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
+    borderColor: theme.colors.shadowLight,
+    shadowColor: theme.colors.shadowDark,
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 4,
   },
   modalCloseButtonText: {
     color: theme.colors.textSecondary,

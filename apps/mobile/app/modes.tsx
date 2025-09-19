@@ -8,6 +8,7 @@ import { useLocalization } from '@/context/LocalizationContext';
 import { getGameModeCopy } from '@/constants/gameModes';
 import { useRemoteConfig } from '@/context/RemoteConfigContext';
 import { theme } from '@/constants/theme';
+import { RabatizeBadge } from '@/components/RabatizeBadge';
 
 const ModeSelectionScreen = () => {
   const {
@@ -35,8 +36,13 @@ const ModeSelectionScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
       <View style={styles.container}>
-        <Text style={styles.title}>{t('modes.title')}</Text>
-        <Text style={styles.subtitle}>{t('modes.subtitle')}</Text>
+        <View style={styles.headerRow}>
+          <RabatizeBadge size="sm" />
+          <View style={styles.headerCopy}>
+            <Text style={styles.title}>{t('modes.title')}</Text>
+            <Text style={styles.subtitle}>{t('modes.subtitle')}</Text>
+          </View>
+        </View>
 
         <ScrollView style={styles.modeList} contentContainerStyle={styles.modeListContent}>
           {gameModes.map((mode) => {
@@ -109,6 +115,15 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     gap: 20,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerCopy: {
+    flex: 1,
+    gap: 4,
+  },
   title: {
     fontSize: 30,
     fontWeight: '700',
@@ -132,7 +147,7 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
     shadowOffset: { width: 8, height: 8 },
     shadowOpacity: 0.32,
@@ -180,7 +195,7 @@ const styles = StyleSheet.create({
     gap: 16,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
     shadowOffset: { width: 8, height: 8 },
     shadowOpacity: 0.35,
@@ -210,7 +225,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.65)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
     shadowOffset: { width: 6, height: 6 },
     shadowOpacity: 0.32,
@@ -242,9 +257,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: theme.colors.accent,
     gap: 4,
-    shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.3,
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
     shadowRadius: 18,
     elevation: 8,
   },

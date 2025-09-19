@@ -16,6 +16,7 @@ import {
 import { useGame } from '@/context/GameContext';
 import { useLocalization } from '@/context/LocalizationContext';
 import { theme } from '@/constants/theme';
+import { RabatizeBadge } from '@/components/RabatizeBadge';
 
 const PlayerSetupScreen = () => {
   const { players, activePlayers, updatePlayer, addPlayer, removePlayer, resetMode } = useGame();
@@ -58,9 +59,12 @@ const PlayerSetupScreen = () => {
               <Text style={styles.languageFlag}>{flag}</Text>
             </Pressable>
           </View>
-          <View style={styles.header}>
-            <Text style={styles.title}>{t('home.title')}</Text>
-            <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
+          <View style={styles.heroCard}>
+            <RabatizeBadge size="lg" />
+            <View style={styles.header}>
+              <Text style={styles.title}>{t('home.title')}</Text>
+              <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
+            </View>
           </View>
 
           <View style={styles.playerSection}>
@@ -136,20 +140,34 @@ const styles = StyleSheet.create({
   },
   languageToggle: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 18,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    borderRadius: 20,
+    backgroundColor: theme.colors.accent,
     shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOffset: { width: 4, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
     elevation: 4,
   },
   languageFlag: {
     fontSize: 18,
+    color: '#fff7eb',
+  },
+  heroCard: {
+    borderRadius: 28,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.shadowLight,
+    shadowColor: theme.colors.shadowDark,
+    shadowOffset: { width: 10, height: 12 },
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    elevation: 8,
+    gap: 16,
+    alignItems: 'center',
   },
   title: {
     fontSize: 34,
@@ -178,7 +196,7 @@ const styles = StyleSheet.create({
     elevation: 6,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
   },
   playerRow: {
     flexDirection: 'row',
@@ -201,7 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
     shadowColor: theme.colors.shadowDark,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.3,
@@ -225,12 +243,12 @@ const styles = StyleSheet.create({
     elevation: 6,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: theme.colors.shadowLight,
   },
   addButtonText: {
-    color: theme.colors.textSecondary,
+    color: theme.colors.accent,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   startButton: {
     paddingVertical: 18,
@@ -238,10 +256,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     backgroundColor: theme.colors.accent,
-    shadowColor: theme.colors.shadowDark,
-    shadowOffset: { width: 10, height: 10 },
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.35,
-    shadowRadius: 16,
+    shadowRadius: 20,
     elevation: 8,
   },
   startButtonDisabled: {
